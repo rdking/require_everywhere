@@ -1,0 +1,26 @@
+{
+  "name": "require_everywhere",
+  "version": "1.0.0",
+  "description": "Consistent asynchronous require support for Node, Browsgit er main threads, and WebWorkers.",
+  "main": "require.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rdking/require_everywhere.git"
+  },
+  "keywords": [
+    "JavaScript",
+    "modules",
+    "require",
+    "async",
+    "import"
+  ],
+  "author": "Ranando D. King",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/rdking/require_everywhere/issues"
+  },
+  "homepage": "https://github.com/rdking/require_everywhere#readme"
+}
