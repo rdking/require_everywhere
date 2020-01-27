@@ -109,7 +109,7 @@ require = (function() {
                     module.exports = JSON.parse(response);
                     module.loaded = true;
                 } catch(e) {
-                    module.fn = eval(`(async function(module, exports) {${response}});`);
+                    module.fn = eval(`(async function(exports, require, module, __filename, __dirname) {${response}});`);
                     module.loaded = true;
                 }
             }
@@ -128,7 +128,8 @@ require = (function() {
     function found(module, script) {
         module.mapping = script;
         return new Promise((resolve, reject) => {
-            let mod = module.fn(module, module.exports);
+            let sDir = script.substring(0, script.lastIndexOf("/"));
+            let mod = module.fn(module.exports, require, module, script, sDir);
             mod.then(() => {
                 module.ready = true;
                 resolve(module.exports);
