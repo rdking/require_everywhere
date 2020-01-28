@@ -31,3 +31,5 @@ Module.prototype.require = function require_everywhere(file, groupId) {
   
   return retval;
 }
+
+module.exports = Module.prototype.require;
