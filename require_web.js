@@ -112,6 +112,7 @@ require = (function() {
                     module.fn = eval(`(async function(exports, require, module, __filename, __dirname) {${response}});`);
                     module.loaded = true;
                 }
+                module.mapping = script;
             }
             else {
                 console.log(`Failed to load "${script}".`);
@@ -126,7 +127,6 @@ require = (function() {
     }
 
     function found(module, script) {
-        module.mapping = script;
         return new Promise((resolve, reject) => {
             let sDir = script.substring(0, script.lastIndexOf("/"));
             let mod = module.fn(module.exports, require, module, script, sDir);
