@@ -87,6 +87,18 @@ const FileName = (function() {
     }
 })();
 
+function fixName(name) {
+    let index = name.lastIndexOf(".");
+    if (index === -1) {
+        let suffix = name.substr(index);
+        if (![".json", ".js"].includes(suffix)) {
+            name += '.js';
+        }
+    }
+
+    return name;
+}
+
 /**
  * @function
  * Asynchronous require
@@ -103,18 +115,6 @@ require = (function() {
     const modules = [];
     const groups = new Map();
     const handlers = new WeakMap();
-
-    function fixName(name) {
-        let index = name.lastIndexOf(".");
-        if (index === -1) {
-            let suffix = name.substr(index);
-            if (![".json", ".js"].includes(suffix)) {
-                name += '.js';
-            }
-        }
-
-        return name;
-    }
 
     function getFile(url) {
         return fetch(url).then((response) => {
