@@ -61,6 +61,32 @@ const PromiseChain = (function () {
     return PromiseChain;
 })();
 
+const FileName = (function() {
+    const pvt = new WeakMap;
+
+    return class FileName {
+        constructor(filename) {
+            let parts = filename.match(/(?:(\/?\w+)?(\/.*)?\/)?(.*)/);
+            pvt.set(this, {
+                original: filename,
+                package: parts[1] || parts[3],
+                path: parts[2] ? parts[2] + "/" : "",
+                file: parts[3]
+            });
+        }
+
+        get requestedName() { return pvt.get(this).original; }
+        get correctedName() { return fixName(this.requestedName); }
+        get packageName() { return pvt.get(this).package; }
+        get packagePrefix() {
+            let p = pvt.get(this);
+            return `/node_modules/${p.package || p.file}`;
+        }
+        get path() { return pvt.get(this).path; }
+        get name() { return pvt.get(this).file; }
+    }
+})();
+
 /**
  * @function
  * Asynchronous require
@@ -141,13 +167,13 @@ require = (function() {
     }
 
     async function findFile(module, groupId) {
-        let file = module.file;
+        let file = new FileName(module.file);
         let hasGroup = groups.has(groupId);
         
         return new Promise((resolve, reject) => {
             setTimeout(() => {
                 //First, assume we're given a full path...
-                let script = fixName(file);
+                let script = file.correctedName;
                 
                 loadFile(module, script).then(() => {
                     if (!module.loaded) {
@@ -156,12 +182,12 @@ require = (function() {
                     resolve(module);
                 }).catch((e) => {
                     module.error = e;
-                    script = `/node_modules/${file}/package.json`;
+                    script = `${file.packagePrefix}/package.json`;
                     loadFile({exports: {}, loaded: false}, script).then((mod) => {
                         if (!mod.loaded) {
                             throw new Error(`File ${script} not found...`, module.error);
                         }
-                        script = `/node_modules/${file}/${mod.exports.main}`;
+                        script = `${file.packagePrefix}/${mod.exports.main}`;
                         loadFile(module, script).then(() => {
                             if (!module.loaded) {
                                 throw new Error(`File ${script} not found...`, module.error);
@@ -170,7 +196,7 @@ require = (function() {
                         });
                     }).catch((e) => {
                         module.error = e;
-                        script = fixName(`/node_modules/${file}`);
+                        script = fixName(`${file.packagePrefix}/${file.path}${file.name}`);
                         loadFile(module, script).then(() => {
                             if (!module.loaded) {
                                 reject(new Error(`File ${script} not found...`, module.error));
