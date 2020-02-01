@@ -187,7 +187,8 @@ require = (function() {
                         if (!mod.loaded) {
                             throw new Error(`File ${script} not found...`, module.error);
                         }
-                        script = `${file.packagePrefix}/${mod.exports.main}`;
+                        let main = new FileName(mod.exports.main);
+                        script = `${file.packagePrefix}/${main.path}/${file.path}${file.name}`;
                         loadFile(module, script).then(() => {
                             if (!module.loaded) {
                                 throw new Error(`File ${script} not found...`, module.error);
