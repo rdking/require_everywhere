@@ -70,7 +70,7 @@ const FileName = (function() {
             pvt.set(this, {
                 original: filename,
                 package: parts[1] || parts[3],
-                path: parts[2] ? parts[2] + "/" : "",
+                path: parts[2] ? `${parts[2]}/` : "",
                 file: parts[3]
             });
         }
@@ -188,7 +188,13 @@ require = (function() {
                             throw new Error(`File ${script} not found...`, module.error);
                         }
                         let main = new FileName(mod.exports.main);
-                        script = `${file.packagePrefix}/${main.path}/${file.path}${((file.name === file.packageName) ? main : file).name}`;
+                        console.log(main.requestedName);
+                        console.log(main.path);
+                        let mPath = (!main.path && main.packageName && (main.name != main.packageName))
+                            ? main.packageName + "/"
+                            : main.path;
+                        let path = `${file.packagePrefix}/${mPath}${file.path}`;
+                        script = fixName(`${path}${((file.name === file.packageName) ? main : file).name}`);
                         loadFile(module, script).then(() => {
                             if (!module.loaded) {
                                 throw new Error(`File ${script} not found...`, module.error);
