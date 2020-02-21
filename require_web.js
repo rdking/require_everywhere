@@ -130,7 +130,7 @@ require = (function() {
         return getFile(script).then((response) => {
             let retval = module;
             if (response) {
-                console.log(`Loaded "${script}". Attempting to parse...`);
+                console.debug(`Loaded "${script}". Attempting to parse...`);
                 try {
                     module.exports = JSON.parse(response);
                     module.loaded = true;
@@ -141,7 +141,7 @@ require = (function() {
                 module.mapping = script;
             }
             else {
-                console.log(`Failed to load "${script}".`);
+                console.error(`Failed to load "${script}".`);
             }
             return retval;
         }).then(mod => {
@@ -188,8 +188,8 @@ require = (function() {
                             throw new Error(`File ${script} not found...`, module.error);
                         }
                         let main = new FileName(mod.exports.main);
-                        console.log(main.requestedName);
-                        console.log(main.path);
+                        console.debug(`package main file: ${main.requestedName}`);
+                        console.debug(`package path = ${main.path || "N/A"}`);
                         let mPath = (!main.path && main.packageName && (main.name != main.packageName))
                             ? main.packageName + "/"
                             : main.path;
