@@ -135,7 +135,7 @@ require = (function() {
                     module.exports = JSON.parse(response);
                     module.loaded = true;
                 } catch(e) {
-                    module.fn = eval(`(async function(exports, require, module, __filename, __dirname) {${response}});`);
+                    module.fn = eval(`(async function(exports, require, module, __filename, __dirname) {\n${response}\n//# sourceURL=${window.location.origin}${script}\n});`);
                     module.loaded = true;
                 }
                 module.mapping = script;
