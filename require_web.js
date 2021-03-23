@@ -258,7 +258,7 @@ require = (function() {
             //executor, so we have to defer the executor...
             setTimeout(() => {
                 //Do we already have a module for this file?
-                let module = modules.find(mod => mod.file === file);
+                let module = modules.find(mod => fixName(mod.file || "") == fixName(file.toString()));
                     
                 //If we know about it already...
                 if (module) {
