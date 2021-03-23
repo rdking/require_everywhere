@@ -129,19 +129,24 @@ require = (function() {
     function loadFile(module, script) {
         return getFile(script).then((response) => {
             let retval = module;
-            if (response) {
-                console.debug(`Loaded "${script}". Attempting to parse...`);
-                try {
-                    module.exports = JSON.parse(response);
-                    module.loaded = true;
-                } catch(e) {
-                    module.fn = eval(`(async function(exports, require, module, __filename, __dirname) {\n${response}\n//# sourceURL=${window.location.origin}${script}\n});`);
-                    module.loaded = true;
+            if (!module.loaded) {
+                if (response) {
+                    console.debug(`Loaded "${script}". Attempting to parse...`);
+                    try {
+                        module.exports = JSON.parse(response);
+                        module.loaded = true;
+                    } catch(e) {
+                        module.fn = eval(`(async function(exports, require, module, __filename, __dirname) {\n${response}\n//# sourceURL=${window.location.origin}${script}\n});`);
+                        module.loaded = true;
+                    }
+                    module.mapping = script;
                 }
-                module.mapping = script;
+                else {
+                    console.error(`Failed to load "${script}".`);
+                }
             }
             else {
-                console.error(`Failed to load "${script}".`);
+                console.debug(`Skipping loading "${script}". Already loaded.`);
             }
             return retval;
         }).then(mod => {
@@ -154,15 +159,20 @@ require = (function() {
 
     function found(module, script) {
         return new Promise((resolve, reject) => {
-            let sDir = script.substring(0, script.lastIndexOf("/"));
-            let mod = module.fn(module.exports, require, module, script, sDir);
-            mod.then(() => {
-                module.ready = true;
+            if (module.ready) {
                 resolve(module.exports);
-            }).catch(err => {
-                module.errors.push(err);
-                reject(err);
-            });
+            }
+            else {
+                let sDir = script.substring(0, script.lastIndexOf("/"));
+                let mod = module.fn(module.exports, require, module, script, sDir);
+                mod.then(() => {
+                    module.ready = true;
+                    resolve(module.exports);
+                }).catch(err => {
+                    module.errors.push(err);
+                    reject(err);
+                });
+            }
         });
     }
 
