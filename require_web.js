@@ -245,7 +245,7 @@ require = (function() {
         resolve((await require(gid))[0]);
     }
 
-    async function require(file, groupId) {
+    const require = async function require_everywhere(file, groupId) {
         if (groupId && (typeof(groupId) !== "symbol")) {
             throw new TypeError(`"groupId" must be a Symbol if present`);
         }
